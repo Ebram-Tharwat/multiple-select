@@ -13,6 +13,7 @@
 		var that = this;
 		this.$el = $el.hide();
 		this.options = options;
+		this.oldSeletedValues = []; // Add new property to hold the old Seleted-Values(initially empty list)
 		
 		this.$parent = $('<div class="ms-parent"></div>');
 		this.$choice = $('<div class="ms-choice"><span class="placeholder">' + 
@@ -86,6 +87,7 @@
 			this.$disableItems = this.$drop.find('input[name="selectItem"]:disabled');
 			this.events();
 			this.update();
+			this.oldSeletedValues = this.getSelects(); // Intialize the oldSeletedValues array at start in case the select tag has a selected values initially
 		},
 		
 		optionToHtml: function(i, elm, group, groupDisabled) {
@@ -188,7 +190,14 @@
 			this.options.isopen = false;
 			this.$choice.find('>div').removeClass('open');
 			this.$drop.hide();
-			this.options.onClose();
+			var newSeleted = this.getSelects(); // Get the new selected-values
+			// compare the new and old selected-values.
+			// if they are different then fire close() callback provided by the user
+			// if they are identical then do nothing(just hide the $drop div).
+            if (!($(newSeleted).not(this.oldSeletedValues).length == 0 && $(newSeleted).not(this.oldSeletedValues).length == 0)) {
+                this.oldSeletedValues = newSeleted;
+                this.options.onClose();
+            }
 		},
 		
 		update: function() {
